@@ -3,6 +3,14 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Save, Sparkles, BookOpen, X, AlignLeft, ChevronRight, Loader2, Trash2, BookMarked, Mic, MicOff } from 'lucide-react'
 import useVoiceInput from '../hooks/useVoiceInput'
 
+const MOODS = [
+  { emoji: '😄', label: '최고', color: '#22c55e' },
+  { emoji: '🙂', label: '좋음', color: '#84cc16' },
+  { emoji: '😐', label: '보통', color: '#eab308' },
+  { emoji: '😔', label: '울적', color: '#f97316' },
+  { emoji: '😣', label: '힘듦', color: '#ef4444' },
+]
+
 function formatDate(dateStr) {
   const d = new Date(dateStr + 'T00:00:00')
   return d.toLocaleDateString('ko-KR', { month: 'long', day: 'numeric', weekday: 'long' })
@@ -25,6 +33,7 @@ export default function Journal() {
   const [saved, setSaved] = useState(false)
   const [voiceBase, setVoiceBase] = useState('')
   const [interimDisplay, setInterimDisplay] = useState('')
+  const [mood, setMood] = useState(null)
   const textareaRef = useRef(null)
 
   const today = new Date().toISOString().split('T')[0]
@@ -44,7 +53,10 @@ export default function Journal() {
 
   useEffect(() => {
     const existing = entries.find(e => e.date === today)
-    if (existing) setText(existing.text)
+    if (existing) {
+      setText(existing.text)
+      if (existing.mood) setMood(existing.mood)
+    }
   }, [])
 
   const callAI = async (action) => {
@@ -71,7 +83,7 @@ export default function Journal() {
 
   const saveEntry = () => {
     if (!text.trim()) return
-    const entry = { id: Date.now(), date: today, text, createdAt: new Date().toISOString() }
+    const entry = { id: Date.now(), date: today, text, mood, createdAt: new Date().toISOString() }
     const updated = [entry, ...entries.filter(e => e.date !== today)]
     setEntries(updated)
     localStorage.setItem('journal', JSON.stringify(updated))
@@ -79,6 +91,7 @@ export default function Journal() {
     setVoiceBase('')
     setInterimDisplay('')
     setAiResult('')
+    setMood(null)
     setSaved(true)
     setTimeout(() => setSaved(false), 2000)
   }
@@ -108,6 +121,25 @@ export default function Journal() {
           <BookOpen size={14} />
           <span>{entries.length}개의 일기</span>
         </motion.button>
+      </div>
+
+      {/* 기분 선택 */}
+      <div className="glass rounded-2xl p-4 mb-4">
+        <p className="text-xs font-semibold text-white/50 mb-3">오늘의 기분은 어때요?</p>
+        <div className="flex items-center justify-between gap-2">
+          {MOODS.map(m => (
+            <motion.button
+              key={m.emoji}
+              whileTap={{ scale: 0.88 }}
+              onClick={() => setMood(mood === m.emoji ? null : m.emoji)}
+              className={'flex-1 flex flex-col items-center gap-1 py-2.5 rounded-xl transition-all border ' + (mood === m.emoji ? 'border-white/30 bg-white/10' : 'border-transparent hover:bg-white/5')}
+              style={mood === m.emoji ? { boxShadow: `0 0 16px ${m.color}40` } : {}}
+            >
+              <span className={'text-2xl transition-all ' + (mood === m.emoji ? 'scale-110' : 'opacity-60 grayscale')}>{m.emoji}</span>
+              <span className={'text-xs font-medium ' + (mood === m.emoji ? 'text-white' : 'text-white/30')}>{m.label}</span>
+            </motion.button>
+          ))}
+        </div>
       </div>
 
       {/* 에디터 카드 */}
@@ -275,9 +307,12 @@ export default function Journal() {
                         <span className={'text-xs font-bold ' + (entry.date === today ? 'text-violet-300' : 'text-white/50')}>
                           {entry.date === today ? '오늘 ✨' : formatDateShort(entry.date)}
                         </span>
-                        <button onClick={e => deleteEntry(entry.id, e)} className="text-white/15 hover:text-red-400 transition-colors">
-                          <Trash2 size={12} />
-                        </button>
+                        <div className="flex items-center gap-1.5">
+                          {entry.mood && <span className="text-sm">{entry.mood}</span>}
+                          <button onClick={e => deleteEntry(entry.id, e)} className="text-white/15 hover:text-red-400 transition-colors">
+                            <Trash2 size={12} />
+                          </button>
+                        </div>
                       </div>
                       <p className="text-xs text-white/60 leading-relaxed line-clamp-2">{entry.text}</p>
                     </motion.div>

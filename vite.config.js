@@ -81,6 +81,29 @@ ${habitContext}`
         return { reply: result }
       })
     })
+
+    // AI 주간 리포트
+    server.middlewares.use('/api/report', (req, res) => {
+      handleRequest(req, res, async ({ summary, moodSummary }, token) => {
+        if (!token) {
+          return { result: `📊 이번 주 회고 (데모)\n\n꾸준히 습관을 실천하고 계시네요! 데이터를 보면 성장의 흐름이 보여요. 다음 주에는 가장 어려웠던 습관에 조금 더 집중해보세요.\n\n[💡 GitHub 토큰을 설정하면 실제 AI가 분석합니다]` }
+        }
+        const prompt = `당신은 따뜻하고 통찰력 있는 생산성 코치입니다. 아래 한 주간의 습관 데이터와 기분 기록을 바탕으로 주간 회고 리포트를 작성해주세요.
+
+[형식]
+1. 이번 주 한 줄 요약 (격려 포함)
+2. 잘한 점 2가지
+3. 다음 주 개선 제안 2가지
+이모지를 적절히 사용하고, 한국어로 따뜻하게 작성하세요. 300자 이내.
+
+[습관 데이터]
+${summary}
+
+[기분 기록]
+${moodSummary}`
+        return { result: await callGitHubModels(token, [{ role: 'user', content: prompt }], 600) }
+      })
+    })
   }
 }
 
