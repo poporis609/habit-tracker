@@ -1,20 +1,6 @@
 import { motion, AnimatePresence } from 'framer-motion'
 import { Trash2, Flame, Check } from 'lucide-react'
-
-function getStreak(completedDates) {
-  if (!completedDates.length) return 0
-  const sorted = [...completedDates].sort((a, b) => new Date(b) - new Date(a))
-  let streak = 0
-  let cur = new Date(); cur.setHours(0,0,0,0)
-  for (const d of sorted) {
-    const date = new Date(d); date.setHours(0,0,0,0)
-    const diff = (cur - date) / 86400000
-    if (diff === streak) streak++
-    else if (diff === streak + 1) { streak++; cur = date }
-    else break
-  }
-  return streak
-}
+import { getStreak } from '../lib/habits'
 
 const GRADIENTS = {
   blue:   'from-blue-500 to-cyan-400',

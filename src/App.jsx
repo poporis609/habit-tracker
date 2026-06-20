@@ -8,6 +8,7 @@ import Stats from './components/Stats'
 import Header from './components/Header'
 import Journal from './components/Journal'
 import Coach from './components/Coach'
+import { completionRate } from './lib/habits'
 
 const MESSAGES = [
   "오늘도 한 걸음씩! 작은 습관이 큰 변화를 만들어요 💪",
@@ -59,7 +60,7 @@ export default function App() {
   useEffect(() => { localStorage.setItem('habits', JSON.stringify(habits)) }, [habits])
 
   const todayDone = habits.filter(h => h.completedDates.includes(today)).length
-  const rate = habits.length > 0 ? Math.round((todayDone / habits.length) * 100) : 0
+  const rate = completionRate(habits, today)
 
   useEffect(() => {
     if (rate === 100 && prevRate.current < 100 && habits.length > 0) {

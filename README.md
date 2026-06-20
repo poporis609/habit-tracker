@@ -1,5 +1,7 @@
 # 🌱 Groo · AI 습관 트래커
 
+![Groo 배너](./docs/banner.svg)
+
 > 매일의 **습관·일기·기분**을 기록하고, **AI 코치**가 회고와 동기를 부여하는 개인 생산성 웹앱
 
 [![Live Demo](https://img.shields.io/badge/Live-Demo-8b5cf6?style=flat-square)](https://wonderful-mud-022954f00.7.azurestaticapps.net)
@@ -7,6 +9,16 @@
 [![Cost](https://img.shields.io/badge/Cost-%240%20Free%20Tier-22c55e?style=flat-square)](#-비용-전부-무료)
 
 **🔗 배포 주소:** https://wonderful-mud-022954f00.7.azurestaticapps.net
+
+---
+
+## 📱 화면 미리보기
+
+| 오늘 (습관) | 통계 | 일기 + 기분 | AI 코치 |
+|:---:|:---:|:---:|:---:|
+| 원터치 체크 · 스트릭 🔥 · 컨페티 | 12주 히트맵 · AI 주간 리포트 | 음성 일기 · AI 확장/요약 | 내 데이터 기반 대화 |
+
+> 실제 동작은 위 **배포 주소**에서 바로 확인할 수 있어요.
 
 ---
 
@@ -76,6 +88,12 @@ npm run dev   # http://localhost:5173
 npm run build   # dist/ 생성
 ```
 
+### 테스트
+
+```bash
+npm test   # Vitest 단위 테스트 (스트릭·달성률 계산 로직)
+```
+
 ---
 
 ## 💰 비용 (전부 무료)
@@ -116,4 +134,10 @@ habit-tracker/
 ## 📋 문서
 
 - 제품 상세 기획은 [PRD.md](./PRD.md) 참고
+
+---
+
+## 📄 라이선스
+
+[MIT License](./LICENSE) © 2026 poporis609
 
