@@ -1,0 +1,100 @@
+import { motion, AnimatePresence } from 'framer-motion'
+import { Trash2, Flame, Check } from 'lucide-react'
+
+function getStreak(completedDates) {
+  if (!completedDates.length) return 0
+  const sorted = [...completedDates].sort((a, b) => new Date(b) - new Date(a))
+  let streak = 0
+  let cur = new Date(); cur.setHours(0,0,0,0)
+  for (const d of sorted) {
+    const date = new Date(d); date.setHours(0,0,0,0)
+    const diff = (cur - date) / 86400000
+    if (diff === streak) streak++
+    else if (diff === streak + 1) { streak++; cur = date }
+    else break
+  }
+  return streak
+}
+
+const GRADIENTS = {
+  blue:   'from-blue-500 to-cyan-400',
+  green:  'from-green-500 to-emerald-400',
+  purple: 'from-violet-500 to-purple-400',
+  orange: 'from-orange-500 to-amber-400',
+  pink:   'from-pink-500 to-rose-400',
+}
+
+export default function HabitList({ habits, today, onToggle, onDelete }) {
+  if (!habits.length) {
+    return (
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center py-20">
+        <p className="text-6xl mb-4">🌱</p>
+        <p className="font-semibold text-white/60">아직 습관이 없어요</p>
+        <p className="text-sm mt-1 text-white/30">+ 추가 탭에서 만들어보세요</p>
+      </motion.div>
+    )
+  }
+  return (
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-3">
+      <AnimatePresence>
+        {habits.map((habit, i) => {
+          const done = habit.completedDates.includes(today)
+          const streak = getStreak(habit.completedDates)
+          const grad = GRADIENTS[habit.color] || GRADIENTS.purple
+          return (
+            <motion.div
+              key={habit.id}
+              layout
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, x: 40, scale: 0.9 }}
+              transition={{ delay: i * 0.05 }}
+              whileTap={{ scale: 0.97 }}
+              onClick={() => onToggle(habit.id)}
+              className={'relative overflow-hidden rounded-2xl p-4 cursor-pointer transition-all duration-300 border ' + (done ? 'habit-done glow-purple' : 'glass')}
+            >
+              {done && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="absolute inset-0 bg-gradient-to-r from-violet-500/10 to-pink-500/5 pointer-events-none"
+                />
+              )}
+              <div className="flex items-center gap-4 relative">
+                <div className={'w-11 h-11 rounded-xl bg-gradient-to-br ' + grad + ' flex items-center justify-center text-xl shadow-lg flex-shrink-0'}>
+                  {habit.emoji}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className={'font-bold text-sm truncate ' + (done ? 'text-white/40 line-through' : 'text-white')}>{habit.name}</p>
+                  <div className="flex items-center gap-2 mt-0.5">
+                    {streak > 0 && (
+                      <div className="flex items-center gap-1">
+                        <Flame size={11} className="text-orange-400" />
+                        <span className="text-xs text-orange-300 font-semibold">{streak}일 연속</span>
+                      </div>
+                    )}
+                    {!streak && <span className="text-xs text-white/25">시작해보세요</span>}
+                  </div>
+                </div>
+                <div className="flex items-center gap-2 flex-shrink-0">
+                  <motion.div
+                    animate={{ scale: done ? 1 : 0.85 }}
+                    className={'w-8 h-8 rounded-full flex items-center justify-center transition-all ' + (done ? 'bg-gradient-to-br from-violet-500 to-pink-500 shadow-lg pulse-glow' : 'border-2 border-white/20')}
+                  >
+                    {done && <Check size={14} className="text-white" strokeWidth={3} />}
+                  </motion.div>
+                  <button
+                    onClick={e => { e.stopPropagation(); onDelete(habit.id) }}
+                    className="text-white/20 hover:text-red-400 transition-colors p-1 rounded-lg hover:bg-red-400/10"
+                  >
+                    <Trash2 size={14} />
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          )
+        })}
+      </AnimatePresence>
+    </motion.div>
+  )
+}

@@ -1,0 +1,9 @@
+{
+  "name": "habit-tracker-api",
+  "version": "1.0.0",
+  "type": "module",
+  "dependencies": {
+    "@copilot-extensions/preview-sdk": "^5.0.1",
+    "openai": "^6.44.0"
+  }
+}
