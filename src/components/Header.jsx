@@ -5,7 +5,7 @@ export default function Header({ motivation }) {
   return (
     <motion.div initial={{ opacity: 0, y: -30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} className="mb-7">
       <div className="flex items-center gap-2 mb-1">
-        <span className="text-xs font-semibold text-purple-300 tracking-widest uppercase">My Habits</span>
+        <span className="text-xs font-semibold text-purple-300 tracking-widest uppercase">Groo · AI 습관 트래커</span>
       </div>
       <h1 className="text-4xl font-black text-white leading-tight">
         오늘의 <span className="text-gradient">습관</span>

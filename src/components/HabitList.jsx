@@ -27,10 +27,18 @@ const GRADIENTS = {
 export default function HabitList({ habits, today, onToggle, onDelete }) {
   if (!habits.length) {
     return (
-      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center py-20">
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center py-16">
         <p className="text-6xl mb-4">🌱</p>
         <p className="font-semibold text-white/60">아직 습관이 없어요</p>
-        <p className="text-sm mt-1 text-white/30">+ 추가 탭에서 만들어보세요</p>
+        <p className="text-sm mt-1 text-white/30">+ 탭에서 첫 습관을 만들어보세요</p>
+        <div className="mt-6 glass rounded-2xl p-4 text-left max-w-xs mx-auto">
+          <p className="text-xs font-bold text-purple-300 mb-2">Groo가 도와드릴게요</p>
+          <ul className="space-y-1.5 text-xs text-white/50">
+            <li>🤖 내 데이터를 아는 AI 코치와 대화</li>
+            <li>📔 음성으로 일기 쓰고 AI가 다듬기</li>
+            <li>📈 한 주를 AI가 자동 회고해주는 리포트</li>
+          </ul>
+        </div>
       </motion.div>
     )
   }
@@ -95,6 +103,18 @@ export default function HabitList({ habits, today, onToggle, onDelete }) {
           )
         })}
       </AnimatePresence>
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: habits.length * 0.05 + 0.1 }}
+        className="glass rounded-2xl px-4 py-3 flex items-center gap-3 mt-4"
+      >
+        <span className="text-xl">🤖</span>
+        <p className="text-xs text-white/55 leading-snug">
+          오늘을 기록했다면 <span className="text-purple-300 font-semibold">AI 코치</span>·
+          <span className="text-purple-300 font-semibold">일기</span> 탭에서 회고와 동기를 받아보세요
+        </p>
+      </motion.div>
     </motion.div>
   )
 }
