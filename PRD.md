@@ -78,7 +78,7 @@
 |------|------|
 | 프론트엔드 | React 19, Vite 8, Tailwind CSS 4, Framer Motion, Lucide |
 | AI | GitHub Models (`gpt-4o-mini`) + OpenAI SDK + `@copilot-extensions/preview-sdk` |
-| 백엔드(API) | Azure Functions (Node.js v4 모델) — `/api/chat`, `/api/ai`, `/api/report` |
+| 백엔드(API) | Azure Functions (Node.js v4 모델) — `/api/chat`, `/api/ai`, `/api/report`, `/api/suggest` |
 | 음성 | Web Speech API (브라우저 내장, `ko-KR`) |
 | 데이터 | 브라우저 localStorage (습관·일기·기분) |
 | 배포 | Azure Static Web Apps (Free) + GitHub Actions CI/CD |
