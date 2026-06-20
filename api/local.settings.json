@@ -1,9 +1,0 @@
-{
-  "version": 2,
-  "host": {
-    "localHttpPort": 7071,
-    "cors": {
-      "allowedOrigins": ["http://localhost:5173"]
-    }
-  }
-}

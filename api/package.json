@@ -2,7 +2,9 @@
   "name": "habit-tracker-api",
   "version": "1.0.0",
   "type": "module",
+  "main": "src/functions/*.js",
   "dependencies": {
+    "@azure/functions": "^4.5.0",
     "@copilot-extensions/preview-sdk": "^5.0.1",
     "openai": "^6.44.0"
   }
