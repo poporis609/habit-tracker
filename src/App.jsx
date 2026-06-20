@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import confetti from 'canvas-confetti'
+import { Download, Upload } from 'lucide-react'
 import HabitList from './components/HabitList'
 import AddHabit from './components/AddHabit'
 import Stats from './components/Stats'
@@ -75,6 +76,43 @@ export default function App() {
     return { ...h, completedDates: done ? h.completedDates.filter(d => d !== today) : [...h.completedDates, today] }
   }))
 
+  const exportData = () => {
+    const data = {
+      version: 1,
+      exportedAt: new Date().toISOString(),
+      habits: JSON.parse(localStorage.getItem('habits') || '[]'),
+      journal: JSON.parse(localStorage.getItem('journal') || '[]'),
+    }
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `groo-backup-${today}.json`
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
+  const importData = e => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    const reader = new FileReader()
+    reader.onload = ev => {
+      try {
+        const data = JSON.parse(ev.target.result)
+        if (!Array.isArray(data.habits)) throw new Error('형식 오류')
+        if (!window.confirm('현재 데이터를 가져온 백업으로 덮어쓸까요?')) return
+        localStorage.setItem('habits', JSON.stringify(data.habits))
+        if (Array.isArray(data.journal)) localStorage.setItem('journal', JSON.stringify(data.journal))
+        setHabits(data.habits)
+        alert('데이터를 복원했어요! 🎉')
+      } catch {
+        alert('올바른 Groo 백업 파일이 아니에요.')
+      }
+    }
+    reader.readAsText(file)
+    e.target.value = ''
+  }
+
   const tabs = [{ key: 'today', label: '오늘' }, { key: 'stats', label: '통계' }, { key: 'journal', label: '일기' }, { key: 'coach', label: '🤖' }, { key: 'add', label: '+' }]
 
   return (
@@ -129,8 +167,21 @@ export default function App() {
           {tab === 'stats' && <Stats key="stats" habits={habits} today={today} />}
           {tab === 'journal' && <Journal key="journal" />}
           {tab === 'coach' && <Coach key="coach" />}
-          {tab === 'add' && <AddHabit key="add" onAdd={h => { addHabit(h); setTab('today') }} />}
+          {tab === 'add' && <AddHabit key="add" existingHabits={habits} onAdd={h => { addHabit(h); setTab('today') }} />}
         </AnimatePresence>
+
+        <div className="mt-8 pt-5 border-t border-white/10 flex items-center justify-center gap-3">
+          <button
+            onClick={exportData}
+            className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold text-white/55 hover:text-white hover:bg-white/10 transition-all"
+          >
+            <Download size={13} /> 백업 내보내기
+          </button>
+          <label className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold text-white/55 hover:text-white hover:bg-white/10 transition-all cursor-pointer">
+            <Upload size={13} /> 복원하기
+            <input type="file" accept="application/json" onChange={importData} className="hidden" />
+          </label>
+        </div>
       </div>
     </div>
   )

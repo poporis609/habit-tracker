@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { Plus } from 'lucide-react'
+import { Plus, Sparkles, Loader2 } from 'lucide-react'
 
 const EMOJIS = ['💧','🏃','📚','🧘','🍎','😴','✍️','🎯','🌿','💊','🎵','🏋️','🧠','🫁','🌅']
 const COLORS = [
@@ -11,16 +11,41 @@ const COLORS = [
   { key: 'pink',   bg: 'from-pink-500 to-rose-400' },
 ]
 
-export default function AddHabit({ onAdd }) {
+export default function AddHabit({ onAdd, existingHabits = [] }) {
   const [name, setName] = useState('')
   const [emoji, setEmoji] = useState('🎯')
   const [color, setColor] = useState('purple')
+  const [suggesting, setSuggesting] = useState(false)
+  const [suggestions, setSuggestions] = useState([])
+  const [suggestError, setSuggestError] = useState('')
 
   const handleSubmit = (e) => {
     e.preventDefault()
     if (!name.trim()) return
     onAdd({ name: name.trim(), emoji, color })
     setName(''); setEmoji('🎯'); setColor('purple')
+  }
+
+  const getSuggestions = async () => {
+    setSuggesting(true); setSuggestError('')
+    try {
+      const res = await fetch('/api/suggest', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ existing: existingHabits.map(h => h.name) }),
+      })
+      const data = await res.json()
+      setSuggestions(Array.isArray(data.suggestions) ? data.suggestions : [])
+    } catch {
+      setSuggestError('추천을 불러오지 못했어요. 다시 시도해주세요.')
+    } finally {
+      setSuggesting(false)
+    }
+  }
+
+  const applySuggestion = (s) => {
+    setName(s.name)
+    if (s.emoji) setEmoji(s.emoji)
   }
 
   const selectedColor = COLORS.find(c => c.key === color)
@@ -32,6 +57,47 @@ export default function AddHabit({ onAdd }) {
       <div>
         <h2 className="text-xl font-black text-white">새 습관 만들기</h2>
         <p className="text-sm text-white/40 mt-1">작은 습관이 큰 변화를 만들어요</p>
+      </div>
+
+      <div className="rounded-2xl p-4 border border-violet-400/30 bg-gradient-to-br from-violet-500/10 to-purple-500/5">
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2">
+            <Sparkles size={16} className="text-purple-300" />
+            <p className="text-sm font-bold text-white">AI 습관 추천</p>
+          </div>
+          <motion.button
+            whileTap={{ scale: 0.95 }}
+            type="button"
+            onClick={getSuggestions}
+            disabled={suggesting}
+            className="px-3 py-1.5 rounded-lg text-xs font-bold bg-gradient-to-r from-violet-600 to-purple-500 text-white flex items-center gap-1.5 disabled:opacity-60"
+          >
+            {suggesting ? <Loader2 size={13} className="animate-spin" /> : <Sparkles size={13} />}
+            {suggesting ? '추천 중...' : '추천받기'}
+          </motion.button>
+        </div>
+        {suggestError && <p className="text-xs text-red-300 mt-2">{suggestError}</p>}
+        {suggestions.length > 0 && (
+          <div className="flex flex-wrap gap-2 mt-3">
+            {suggestions.map((s, i) => (
+              <motion.button
+                key={i}
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: i * 0.05 }}
+                whileTap={{ scale: 0.95 }}
+                type="button"
+                onClick={() => applySuggestion(s)}
+                className="px-3 py-1.5 rounded-full text-xs font-semibold bg-white/10 hover:bg-white/20 text-white/85 transition-all flex items-center gap-1.5"
+              >
+                <span>{s.emoji}</span>{s.name}
+              </motion.button>
+            ))}
+          </div>
+        )}
+        {suggestions.length === 0 && !suggestError && (
+          <p className="text-xs text-white/40 mt-2">버튼을 누르면 내 습관을 분석해 새 습관을 제안해요</p>
+        )}
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-5">

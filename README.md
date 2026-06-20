@@ -19,9 +19,11 @@
 | 📊 **통계 대시보드** | 달성률·스트릭 요약, 7일 차트, **12주 잔디 히트맵**, 기분 추이 |
 | 📔 **일기 + 기분** | 날짜별 일기 저장, 5단계 기분 기록 |
 | 🤖 **AI 코치** | 내 습관·일기 데이터를 기반으로 대화하는 생산성 코치 |
+| 🪄 **AI 습관 추천** | 내 기존 습관을 분석해 겹치지 않는 새 습관 3개 제안 |
 | 🪄 **AI 일기 도우미** | 일기를 AI가 풍부하게 **확장**하거나 핵심만 **요약** |
 | 📈 **AI 주간 리포트** | 한 주 데이터를 분석해 회고 + 다음 주 제안 자동 생성 |
 | 🎤 **음성 입력(STT)** | 말로 일기·질문 작성 (브라우저 내장 Web Speech API) |
+| 💾 **데이터 백업/복원** | 습관·일기를 JSON으로 내보내기/가져오기 (기기 이전 대비) |
 
 ---
 
@@ -37,6 +39,7 @@
 | `POST /api/chat` | AI 코치 대화 |
 | `POST /api/ai` | 일기 확장 / 요약 |
 | `POST /api/report` | AI 주간 리포트 |
+| `POST /api/suggest` | AI 습관 추천 |
 
 ---
 
@@ -95,7 +98,8 @@ habit-tracker/
 │   └── src/functions/
 │       ├── chat.js             # AI 코치
 │       ├── ai.js               # 일기 확장/요약
-│       └── report.js           # AI 주간 리포트
+│       ├── report.js           # AI 주간 리포트
+│       └── suggest.js          # AI 습관 추천
 ├── src/
 │   ├── components/             # Header, HabitList, AddHabit, Stats, Journal, Coach
 │   ├── hooks/useVoiceInput.js  # 음성 입력 훅

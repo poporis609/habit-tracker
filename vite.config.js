@@ -104,6 +104,41 @@ ${moodSummary}`
         return { result: await callGitHubModels(token, [{ role: 'user', content: prompt }], 600) }
       })
     })
+
+    // AI 습관 추천
+    server.middlewares.use('/api/suggest', (req, res) => {
+      handleRequest(req, res, async ({ existing = [] }, token) => {
+        const fallback = [
+          { name: '아침 물 한 잔', emoji: '💧' },
+          { name: '10분 스트레칭', emoji: '🧘' },
+          { name: '감사 일기 쓰기', emoji: '✍️' },
+        ]
+        if (!token) return { suggestions: fallback }
+        const list = Array.isArray(existing) ? existing : []
+        const prompt = `당신은 습관 형성 전문가입니다. 사용자가 지속 가능한 새 습관 3개를 추천해주세요.
+${list.length ? `사용자가 이미 가진 습관: ${list.join(', ')}. 이와 겹치지 않는 새로운 습관을 추천하세요.` : '건강·자기계발에 도움되는 기본 습관을 추천하세요.'}
+
+반드시 아래 JSON 배열 형식으로만 답하세요. 다른 설명은 절대 포함하지 마세요.
+[{"name":"습관 이름(10자 이내, 한국어)","emoji":"이모지 1개"}, ...]`
+        const raw = await callGitHubModels(token, [{ role: 'user', content: prompt }], 300)
+        const match = raw.match(/\[[\s\S]*\]/)
+        let suggestions = fallback
+        if (match) {
+          try {
+            const parsed = JSON.parse(match[0])
+            if (Array.isArray(parsed) && parsed.length) {
+              suggestions = parsed
+                .filter(s => s && s.name)
+                .slice(0, 3)
+                .map(s => ({ name: String(s.name).slice(0, 20), emoji: String(s.emoji || '🎯').slice(0, 4) }))
+            }
+          } catch {
+            // 폴백 유지
+          }
+        }
+        return { suggestions }
+      })
+    })
   }
 }
 
